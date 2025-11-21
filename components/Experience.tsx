@@ -13,19 +13,18 @@ const Experience: React.FC = () => {
           viewport={{ once: true }}
           className="mb-20"
         >
-           <span className="text-cyan-500 font-mono text-sm tracking-wider uppercase mb-2 block">Career History</span>
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-100">Professional Experience</h2>
+           <span className="text-accent font-mono text-sm tracking-wider uppercase mb-2 block">Career History</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-text-primary">Professional Experience</h2>
         </motion.div>
 
         <div className="space-y-16 relative">
           {/* Continuous Timeline Line */}
-          {/* Adjusted left position to 300px and ensure Grid layout respects it */}
-          <div className="absolute left-0 md:left-[300px] top-4 bottom-0 w-px bg-slate-800 hidden md:block">
+          <div className="absolute left-0 md:left-[300px] top-4 bottom-0 w-px bg-border-primary hidden md:block">
             <motion.div 
                 initial={{ height: 0 }}
                 whileInView={{ height: "100%" }}
                 transition={{ duration: 1.5, ease: "easeInOut" }}
-                className="w-full bg-gradient-to-b from-cyan-500 via-blue-600 to-transparent opacity-50"
+                className="w-full bg-gradient-to-b from-accent via-blue-600 to-transparent opacity-50"
             />
           </div>
 
@@ -40,32 +39,32 @@ const Experience: React.FC = () => {
             >
                {/* Timeline Node */}
                <div className="hidden md:block absolute left-[294px] top-1.5 z-10">
-                   <div className="w-3 h-3 rounded-full bg-slate-950 border-2 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)] group-hover:scale-125 transition-transform duration-300"></div>
+                   <div className="w-3 h-3 rounded-full bg-bg-primary border-2 border-accent shadow-[0_0_10px_var(--accent-glow)] group-hover:scale-125 transition-transform duration-300"></div>
                </div>
 
-              {/* Left Column (Meta) - Reduced width to 260px to create gap from 300px line */}
+              {/* Left Column (Meta) */}
               <div className="md:w-[260px] flex-shrink-0 md:text-right pt-1 pr-4">
-                <div className="text-xl font-bold text-slate-200 mb-2 group-hover:text-cyan-400 transition-colors">{job.period}</div>
-                <div className="text-slate-500 text-sm flex md:justify-end items-center gap-2 mb-1">
+                <div className="text-xl font-bold text-text-primary mb-2 group-hover:text-accent transition-colors">{job.period}</div>
+                <div className="text-text-muted text-sm flex md:justify-end items-center gap-2 mb-1">
                   <Building2 size={14} /> {job.company}
                 </div>
-                 <div className="text-slate-500 text-sm flex md:justify-end items-center gap-2">
+                 <div className="text-text-muted text-sm flex md:justify-end items-center gap-2">
                   <MapPin size={14} /> {job.location}
                 </div>
               </div>
 
-              {/* Right Column (Content) - Added left margin/padding to clear the line */}
+              {/* Right Column (Content) */}
               <div className="flex-1 md:pl-12">
-                <div className="bg-slate-900/40 backdrop-blur-sm border border-slate-800/60 p-8 rounded-2xl hover:border-cyan-500/30 hover:bg-slate-900/60 transition-all duration-300 shadow-lg group-hover:shadow-cyan-900/10">
-                    <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                <div className="bg-bg-secondary/40 backdrop-blur-sm border border-border-primary p-8 rounded-2xl hover:border-accent/30 hover:bg-bg-secondary/60 transition-all duration-300 shadow-lg">
+                    <h3 className="text-2xl font-bold text-text-primary mb-6 flex items-center gap-3">
                         {job.role}
-                        <span className="hidden group-hover:inline-block text-cyan-500 animate-pulse">•</span>
+                        <span className="hidden group-hover:inline-block text-accent animate-pulse">•</span>
                     </h3>
                     
                     <ul className="space-y-4">
                     {job.description.map((point, idx) => (
-                        <li key={idx} className="text-slate-400 text-base leading-relaxed flex items-start gap-3 group/item">
-                            <span className="mt-1.5 text-cyan-500/50 group-hover/item:text-cyan-400 transition-colors">
+                        <li key={idx} className="text-text-secondary text-base leading-relaxed flex items-start gap-3 group/item">
+                            <span className="mt-1.5 text-accent/50 group-hover/item:text-accent transition-colors">
                                 <ChevronRight size={16} />
                             </span>
                             <span>{point}</span>

@@ -7,17 +7,22 @@ import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 import CustomCursor from './components/CustomCursor';
+import ThemeToggle from './components/ThemeToggle';
+import { ThemeProvider } from './contexts/ThemeContext';
 
-function App() {
+function AppContent() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-cyan-500/30 cursor-none">
+    <div className="min-h-screen bg-bg-primary text-text-primary selection:bg-accent/30 cursor-none transition-colors duration-500">
       {/* Global Custom Cursor */}
       <CustomCursor />
+
+      {/* Theme Switcher */}
+      <ThemeToggle />
 
       <Navigation />
       
       {/* 3D Background Canvas - Suspense handles the loading state of 3D assets */}
-      <Suspense fallback={<div className="fixed inset-0 bg-slate-950 z-[-1]" />}>
+      <Suspense fallback={<div className="fixed inset-0 bg-bg-primary z-[-1]" />}>
         <Background3D />
       </Suspense>
 
@@ -29,6 +34,14 @@ function App() {
         <Contact />
       </main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

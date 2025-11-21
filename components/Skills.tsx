@@ -23,10 +23,9 @@ const TiltCard: React.FC<{ children: React.ReactNode; index: number }> = ({ chil
     const y = e.clientY - rect.top;
     setPosition({ x, y });
     
-    // 3D Tilt Math
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -5; // Max 5deg
+    const rotateX = ((y - centerY) / centerY) * -5; 
     const rotateY = ((x - centerX) / centerX) * 5;
 
     cardRef.current.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
@@ -54,14 +53,14 @@ const TiltCard: React.FC<{ children: React.ReactNode; index: number }> = ({ chil
             onMouseMove={handleMouseMove}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            className="relative h-full bg-slate-900/50 border border-slate-800 rounded-2xl p-8 overflow-hidden group hover:border-slate-700 transition-all duration-200 ease-out transform-gpu"
+            className="relative h-full bg-bg-secondary/50 border border-border-primary rounded-2xl p-8 overflow-hidden group hover:border-border-secondary transition-all duration-200 ease-out transform-gpu"
         >
              {/* Inner Card Spotlight */}
              <div 
                 className="absolute inset-0 transition-opacity duration-500 pointer-events-none"
                 style={{
                   opacity,
-                  background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(6,182,212,0.1), transparent 40%)`
+                  background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, var(--accent-dim), transparent 40%)`
                 }}
              />
              {children}
@@ -72,7 +71,7 @@ const TiltCard: React.FC<{ children: React.ReactNode; index: number }> = ({ chil
 
 const Skills: React.FC = () => {
   return (
-    <section id="skills" className="py-24 px-6 bg-slate-950 relative overflow-hidden">
+    <section id="skills" className="py-24 px-6 bg-bg-primary relative overflow-hidden">
        {/* Background Noise Texture */}
       <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none"></div>
 
@@ -83,8 +82,8 @@ const Skills: React.FC = () => {
           viewport={{ once: true }}
           className="mb-16 text-center"
         >
-           <span className="text-cyan-500 font-mono text-sm tracking-wider uppercase mb-2 block">Capabilities</span>
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-100">Technical Expertise</h2>
+           <span className="text-accent font-mono text-sm tracking-wider uppercase mb-2 block">Capabilities</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-text-primary">Technical Expertise</h2>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
@@ -92,19 +91,19 @@ const Skills: React.FC = () => {
             <TiltCard key={category.category} index={index}>
               <div className="relative z-20">
                   <div className="flex items-center justify-between mb-6">
-                     <div className="p-3 bg-slate-800/50 rounded-xl text-cyan-400 shadow-inner shadow-cyan-900/20 ring-1 ring-slate-700">
+                     <div className="p-3 bg-bg-tertiary/50 rounded-xl text-accent shadow-inner shadow-accent/10 ring-1 ring-border-secondary">
                         {iconMap[category.category] || <Code2 size={24} />}
                      </div>
-                     <span className="text-xs font-mono text-slate-500">{category.skills.length} SKILLS</span>
+                     <span className="text-xs font-mono text-text-muted">{category.skills.length} SKILLS</span>
                   </div>
                 
-                <h3 className="text-xl font-bold text-slate-100 mb-4 group-hover:text-cyan-400 transition-colors">{category.category}</h3>
+                <h3 className="text-xl font-bold text-text-primary mb-4 group-hover:text-accent transition-colors">{category.category}</h3>
                 
                 <div className="flex flex-wrap gap-2">
                     {category.skills.map(skill => (
                     <span
                         key={skill}
-                        className="px-3 py-1.5 text-xs font-medium text-slate-300 bg-slate-800/80 rounded-md border border-slate-700/50 hover:bg-cyan-950/30 hover:border-cyan-500/30 hover:text-cyan-200 transition-all cursor-default"
+                        className="px-3 py-1.5 text-xs font-medium text-text-secondary bg-bg-tertiary/80 rounded-md border border-border-secondary hover:border-accent/30 hover:text-accent transition-all cursor-default"
                     >
                         {skill}
                     </span>

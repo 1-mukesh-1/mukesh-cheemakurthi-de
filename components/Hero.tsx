@@ -75,9 +75,7 @@ const MagneticButton: React.FC<{ children: React.ReactNode; href?: string; class
 const Hero: React.FC = () => {
   const scrambledName = useScrambleText(RESUME_DATA.personal.name);
   const { scrollY } = useScroll();
-  // Parallax for the entire text block to prevent overlapping
   const yText = useTransform(scrollY, [0, 500], [0, 150]); 
-  // Parallax for the card (moving in opposite direction or slower)
   const yCard = useTransform(scrollY, [0, 500], [0, -50]);
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -106,7 +104,7 @@ const Hero: React.FC = () => {
       <div className="max-w-6xl w-full z-10">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
             
-          {/* Text Content - Wrapped in single motion div for unified parallax */}
+          {/* Text Content */}
           <motion.div style={{ y: yText }} className="lg:col-span-3 space-y-8 relative z-10">
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
@@ -114,21 +112,19 @@ const Hero: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 className="flex items-center gap-2 mb-4"
               >
-                <span className="h-px w-8 bg-cyan-500"></span>
-                <span className="text-cyan-400 font-medium tracking-widest text-sm uppercase">Data Engineer</span>
+                <span className="h-px w-8 bg-accent"></span>
+                <span className="text-accent font-medium tracking-widest text-sm uppercase">Data Engineer</span>
               </motion.div>
               
-              <h1 className="text-5xl md:text-7xl font-extrabold text-slate-100 leading-tight mb-4 tracking-tight">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-100 to-slate-500">
+              <h1 className="text-5xl md:text-7xl font-extrabold text-text-primary leading-tight mb-4 tracking-tight font-sans">
                   {scrambledName}
-                </span>
               </h1>
               
               <motion.h2 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
-                className="text-2xl md:text-3xl text-slate-400 font-light flex items-center gap-3"
+                className="text-2xl md:text-3xl text-text-secondary font-light flex items-center gap-3"
               >
                 Building Scalable Data Systems
               </motion.h2>
@@ -137,7 +133,7 @@ const Hero: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-lg text-slate-400 leading-relaxed max-w-2xl border-l-2 border-slate-800 pl-6"
+                className="text-lg text-text-secondary leading-relaxed max-w-2xl border-l-2 border-border-secondary pl-6"
               >
                 {RESUME_DATA.personal.summary}
               </motion.p>
@@ -150,7 +146,7 @@ const Hero: React.FC = () => {
               >
                 <MagneticButton
                   href="#contact"
-                  className="group relative px-8 py-3 bg-cyan-500 text-slate-950 font-bold rounded-full overflow-hidden transition-all hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
+                  className="group relative px-8 py-3 bg-accent text-bg-primary font-bold rounded-full overflow-hidden transition-all hover:shadow-[0_0_30px_var(--accent-glow)]"
                   primary
                 >
                   <span className="relative z-10 flex items-center gap-2">
@@ -161,7 +157,7 @@ const Hero: React.FC = () => {
 
                 <MagneticButton
                   href="#"
-                  className="px-8 py-3 border border-slate-700 hover:border-cyan-500/50 hover:bg-slate-900/50 text-slate-300 font-medium rounded-full transition-all flex items-center gap-2 backdrop-blur-sm"
+                  className="px-8 py-3 border border-border-secondary hover:border-accent/50 hover:bg-bg-secondary/50 text-text-secondary font-medium rounded-full transition-all flex items-center gap-2 backdrop-blur-sm"
                 >
                   <Download size={18} />
                   Download Resume
@@ -178,17 +174,16 @@ const Hero: React.FC = () => {
                 ref={cardRef}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                className="p-8 rounded-2xl bg-gradient-to-br from-slate-900/90 to-slate-900/40 backdrop-blur-xl border border-slate-700/50 shadow-2xl transition-transform duration-100 ease-linear transform-gpu"
+                className="p-8 rounded-2xl bg-gradient-to-br from-bg-secondary/90 to-bg-secondary/40 backdrop-blur-xl border border-border-primary shadow-2xl transition-transform duration-100 ease-linear transform-gpu"
              >
                  {/* Decorative elements on card */}
-                 <div className="absolute top-0 right-0 w-20 h-20 bg-cyan-500/20 blur-[40px] rounded-full pointer-events-none" />
-                 <div className="absolute bottom-0 left-0 w-20 h-20 bg-purple-500/20 blur-[40px] rounded-full pointer-events-none" />
-
+                 <div className="absolute top-0 right-0 w-20 h-20 bg-accent/20 blur-[40px] rounded-full pointer-events-none" />
+                 
                  <div className="space-y-8 relative z-10">
-                    <div className="flex items-center justify-between group hover:bg-white/5 p-3 rounded-lg transition-colors">
+                    <div className="flex items-center justify-between group hover:bg-bg-tertiary/30 p-3 rounded-lg transition-colors">
                         <div className="flex flex-col">
-                             <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Optimization</span>
-                             <span className="text-slate-200 font-medium">Pipeline Runtime</span>
+                             <span className="text-xs text-text-muted uppercase tracking-widest mb-1">Optimization</span>
+                             <span className="text-text-primary font-medium">Pipeline Runtime</span>
                         </div>
                         <div className="text-right">
                             <span className="block text-2xl text-green-400 font-bold font-mono">-87%</span>
@@ -196,25 +191,25 @@ const Hero: React.FC = () => {
                         </div>
                     </div>
                     
-                    <div className="w-full h-px bg-slate-800" />
+                    <div className="w-full h-px bg-border-primary" />
 
-                    <div className="flex items-center justify-between group hover:bg-white/5 p-3 rounded-lg transition-colors">
+                    <div className="flex items-center justify-between group hover:bg-bg-tertiary/30 p-3 rounded-lg transition-colors">
                         <div className="flex flex-col">
-                             <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Scale</span>
-                             <span className="text-slate-200 font-medium">Daily Processing</span>
+                             <span className="text-xs text-text-muted uppercase tracking-widest mb-1">Scale</span>
+                             <span className="text-text-primary font-medium">Daily Processing</span>
                         </div>
                         <div className="text-right">
-                            <span className="block text-2xl text-cyan-400 font-bold font-mono">1TB+</span>
-                            <span className="text-xs text-cyan-500/70">Spark & Hadoop</span>
+                            <span className="block text-2xl text-accent font-bold font-mono">1TB+</span>
+                            <span className="text-xs text-accent-dim text-accent">Spark & Hadoop</span>
                         </div>
                     </div>
 
-                    <div className="w-full h-px bg-slate-800" />
+                    <div className="w-full h-px bg-border-primary" />
 
-                    <div className="flex items-center justify-between group hover:bg-white/5 p-3 rounded-lg transition-colors">
+                    <div className="flex items-center justify-between group hover:bg-bg-tertiary/30 p-3 rounded-lg transition-colors">
                         <div className="flex flex-col">
-                             <span className="text-xs text-slate-500 uppercase tracking-widest mb-1">Quality</span>
-                             <span className="text-slate-200 font-medium">Data Accuracy</span>
+                             <span className="text-xs text-text-muted uppercase tracking-widest mb-1">Quality</span>
+                             <span className="text-text-primary font-medium">Data Accuracy</span>
                         </div>
                         <div className="text-right">
                             <span className="block text-2xl text-purple-400 font-bold font-mono">99.5%</span>
@@ -232,7 +227,7 @@ const Hero: React.FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 1, repeat: Infinity, repeatType: "reverse" }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-slate-500 hover:text-cyan-400 cursor-pointer z-20"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-text-muted hover:text-accent cursor-pointer z-20"
       >
         <ArrowDown size={24} />
       </motion.a>
