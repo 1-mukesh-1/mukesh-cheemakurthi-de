@@ -15,7 +15,9 @@ const CustomCursor: React.FC = () => {
       const target = e.target as HTMLElement;
       const isClickable = window.getComputedStyle(target).cursor === 'pointer' || 
                           target.tagName.toLowerCase() === 'a' || 
-                          target.tagName.toLowerCase() === 'button';
+                          target.tagName.toLowerCase() === 'button' ||
+                          target.closest('a') !== null ||
+                          target.closest('button') !== null;
       setIsPointer(isClickable);
     };
 
@@ -23,42 +25,40 @@ const CustomCursor: React.FC = () => {
     return () => window.removeEventListener('mousemove', mouseMove);
   }, []);
 
-  // Determine colors based on theme for the cursor
-  const cursorColor = theme === 'light' ? 'border-blue-600' : (theme === 'neon' ? 'border-[#00ff41]' : 'border-cyan-400');
-  const centerColor = theme === 'light' ? 'bg-blue-600' : (theme === 'neon' ? 'bg-[#00ff41]' : 'bg-cyan-400');
+  // Determine colors based on theme
+  const dotColor = theme === 'light' ? 'bg-blue-600' : (theme === 'neon' ? 'bg-[#00ff41]' : 'bg-cyan-400');
+  const ringBorder = theme === 'light' ? 'border-blue-600' : (theme === 'neon' ? 'border-[#00ff41]' : 'border-cyan-400');
 
   return (
     <>
-      {/* Center Diamond */}
+      {/* Main Pointer Dot - Moves instantly for precision */}
       <motion.div
-        className={`fixed top-0 left-0 w-2 h-2 ${centerColor} rotate-45 pointer-events-none z-[100]`}
+        className={`fixed top-0 left-0 w-2.5 h-2.5 ${dotColor} rounded-full pointer-events-none z-[100]`}
         animate={{
-          x: mousePosition.x - 4,
-          y: mousePosition.y - 4,
-          scale: isPointer ? 0 : 1
+          x: mousePosition.x - 5,
+          y: mousePosition.y - 5,
+          scale: isPointer ? 0.5 : 1 // Shrink slightly on hover for focus
         }}
-        transition={{ type: "tween", ease: "linear", duration: 0.1 }}
+        transition={{ type: "tween", ease: "linear", duration: 0 }}
       />
       
-      {/* Outer Target Reticle */}
+      {/* Trailing Ring - Follows with physics for fluid feel */}
       <motion.div
-        className={`fixed top-0 left-0 w-8 h-8 border-2 ${cursorColor} pointer-events-none z-[99] backdrop-invert-0`}
-        style={{ borderRadius: '4px' }}
+        className={`fixed top-0 left-0 w-10 h-10 border ${ringBorder} rounded-full pointer-events-none z-[99] bg-transparent`}
         animate={{
-          x: mousePosition.x - 16,
-          y: mousePosition.y - 16,
-          rotate: isPointer ? 45 : 0,
+          x: mousePosition.x - 20,
+          y: mousePosition.y - 20,
           scale: isPointer ? 1.5 : 1,
-          opacity: 0.8
+          opacity: isPointer ? 0.5 : 0.2,
+          borderWidth: isPointer ? '1px' : '1.5px'
         }}
-        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-      >
-         {/* Crosshair lines */}
-         <div className={`absolute top-1/2 left-[-4px] w-[6px] h-[2px] ${centerColor} -translate-y-1/2`} />
-         <div className={`absolute top-1/2 right-[-4px] w-[6px] h-[2px] ${centerColor} -translate-y-1/2`} />
-         <div className={`absolute left-1/2 top-[-4px] w-[2px] h-[6px] ${centerColor} -translate-x-1/2`} />
-         <div className={`absolute left-1/2 bottom-[-4px] w-[2px] h-[6px] ${centerColor} -translate-x-1/2`} />
-      </motion.div>
+        transition={{
+          type: "spring",
+          stiffness: 150,
+          damping: 15,
+          mass: 0.1
+        }}
+      />
     </>
   );
 };
