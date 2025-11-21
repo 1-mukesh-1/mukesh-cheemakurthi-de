@@ -11,20 +11,66 @@ const iconMap: Record<string, React.ReactNode> = {
   "Web": <Globe size={24} />
 };
 
-const Skills: React.FC = () => {
-  const divRef = useRef<HTMLDivElement>(null);
+const TiltCard: React.FC<{ children: React.ReactNode; index: number }> = ({ children, index }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [opacity, setOpacity] = useState(0);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!divRef.current) return;
-    const rect = divRef.current.getBoundingClientRect();
-    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setPosition({ x, y });
+    
+    // 3D Tilt Math
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -5; // Max 5deg
+    const rotateY = ((x - centerX) / centerX) * 5;
+
+    cardRef.current.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
   };
 
   const handleMouseEnter = () => setOpacity(1);
-  const handleMouseLeave = () => setOpacity(0);
+  
+  const handleMouseLeave = () => {
+    setOpacity(0);
+    if (cardRef.current) {
+        cardRef.current.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+    }
+  };
 
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: index * 0.1 }}
+      className="perspective-1000"
+    >
+        <div
+            ref={cardRef}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            className="relative h-full bg-slate-900/50 border border-slate-800 rounded-2xl p-8 overflow-hidden group hover:border-slate-700 transition-all duration-200 ease-out transform-gpu"
+        >
+             {/* Inner Card Spotlight */}
+             <div 
+                className="absolute inset-0 transition-opacity duration-500 pointer-events-none"
+                style={{
+                  opacity,
+                  background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(6,182,212,0.1), transparent 40%)`
+                }}
+             />
+             {children}
+        </div>
+    </motion.div>
+  );
+}
+
+const Skills: React.FC = () => {
   return (
     <section id="skills" className="py-24 px-6 bg-slate-950 relative overflow-hidden">
        {/* Background Noise Texture */}
@@ -41,39 +87,9 @@ const Skills: React.FC = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-slate-100">Technical Expertise</h2>
         </motion.div>
 
-        <div 
-            ref={divRef}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative"
-        >
-             {/* Spotlight Effect Layer */}
-            <div 
-                className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 z-30"
-                style={{
-                    opacity,
-                    background: `radial-gradient(600px circle at ${position.x}px ${position.y}px, rgba(6,182,212,0.15), transparent 40%)`
-                }}
-            />
-
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
           {RESUME_DATA.skills.map((category, index) => (
-            <motion.div
-              key={category.category}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="relative h-full bg-slate-900/50 border border-slate-800 rounded-2xl p-8 overflow-hidden group hover:border-slate-700 transition-colors"
-            >
-               {/* Inner Card Spotlight (Subtle) */}
-               <div 
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{
-                    background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(255,255,255,0.06), transparent 40%)`
-                  }}
-               />
-
+            <TiltCard key={category.category} index={index}>
               <div className="relative z-20">
                   <div className="flex items-center justify-between mb-6">
                      <div className="p-3 bg-slate-800/50 rounded-xl text-cyan-400 shadow-inner shadow-cyan-900/20 ring-1 ring-slate-700">
@@ -95,7 +111,7 @@ const Skills: React.FC = () => {
                     ))}
                 </div>
               </div>
-            </motion.div>
+            </TiltCard>
           ))}
         </div>
       </div>

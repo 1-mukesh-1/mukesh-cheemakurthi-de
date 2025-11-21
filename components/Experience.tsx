@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { RESUME_DATA } from '../constants';
-import { MapPin, Building2, CalendarRange, ChevronRight } from 'lucide-react';
+import { MapPin, Building2, ChevronRight } from 'lucide-react';
 
 const Experience: React.FC = () => {
   return (
@@ -19,6 +19,7 @@ const Experience: React.FC = () => {
 
         <div className="space-y-16 relative">
           {/* Continuous Timeline Line */}
+          {/* Adjusted left position to 300px and ensure Grid layout respects it */}
           <div className="absolute left-0 md:left-[300px] top-4 bottom-0 w-px bg-slate-800 hidden md:block">
             <motion.div 
                 initial={{ height: 0 }}
@@ -35,15 +36,15 @@ const Experience: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative flex flex-col md:flex-row gap-10 md:gap-24 group"
+              className="relative flex flex-col md:flex-row gap-10 group"
             >
                {/* Timeline Node */}
                <div className="hidden md:block absolute left-[294px] top-1.5 z-10">
                    <div className="w-3 h-3 rounded-full bg-slate-950 border-2 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)] group-hover:scale-125 transition-transform duration-300"></div>
                </div>
 
-              {/* Left Column (Meta) */}
-              <div className="md:w-[300px] flex-shrink-0 md:text-right pt-1">
+              {/* Left Column (Meta) - Reduced width to 260px to create gap from 300px line */}
+              <div className="md:w-[260px] flex-shrink-0 md:text-right pt-1 pr-4">
                 <div className="text-xl font-bold text-slate-200 mb-2 group-hover:text-cyan-400 transition-colors">{job.period}</div>
                 <div className="text-slate-500 text-sm flex md:justify-end items-center gap-2 mb-1">
                   <Building2 size={14} /> {job.company}
@@ -53,8 +54,8 @@ const Experience: React.FC = () => {
                 </div>
               </div>
 
-              {/* Right Column (Content) */}
-              <div className="flex-1">
+              {/* Right Column (Content) - Added left margin/padding to clear the line */}
+              <div className="flex-1 md:pl-12">
                 <div className="bg-slate-900/40 backdrop-blur-sm border border-slate-800/60 p-8 rounded-2xl hover:border-cyan-500/30 hover:bg-slate-900/60 transition-all duration-300 shadow-lg group-hover:shadow-cyan-900/10">
                     <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                         {job.role}

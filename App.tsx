@@ -6,10 +6,14 @@ import Experience from './components/Experience';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
+import CustomCursor from './components/CustomCursor';
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-slate-950 text-slate-200 selection:bg-cyan-500/30 cursor-none">
+      {/* Global Custom Cursor */}
+      <CustomCursor />
+
       <Navigation />
       
       {/* 3D Background Canvas - Suspense handles the loading state of 3D assets */}

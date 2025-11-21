@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial, Float, Stars, Line } from '@react-three/drei';
 import * as THREE from 'three';
@@ -22,18 +22,23 @@ function generateSpherePoints(count: number, radius: number) {
   return points;
 }
 
-const DataCloud = () => {
+const DataCloud = ({ scrollSpeed }: { scrollSpeed: React.MutableRefObject<number> }) => {
   const ref = useRef<THREE.Points>(null!);
-  const sphere = useMemo(() => generateSpherePoints(2000, 2), []);
+  const sphere = useMemo(() => generateSpherePoints(3000, 2), []);
 
   useFrame((state, delta) => {
     if (ref.current) {
-      // Rotate the entire cloud
-      ref.current.rotation.x -= delta / 15;
-      ref.current.rotation.y -= delta / 20;
+      // Base rotation
+      const baseRotation = delta / 15;
+      // Warp speed rotation based on scroll
+      const warpRotation = scrollSpeed.current * delta * 2;
       
-      // Pulse effect
-      const scale = 1 + Math.sin(state.clock.elapsedTime * 0.5) * 0.05;
+      ref.current.rotation.x -= baseRotation + warpRotation;
+      ref.current.rotation.y -= baseRotation / 2;
+      
+      // Pulse effect intensity increases with scroll
+      const pulseFrequency = 0.5 + (scrollSpeed.current * 5);
+      const scale = 1 + Math.sin(state.clock.elapsedTime * pulseFrequency) * 0.05;
       ref.current.scale.set(scale, scale, scale);
     }
   });
@@ -55,10 +60,18 @@ const DataCloud = () => {
   );
 };
 
-const NetworkConnections = () => {
-  // visual aesthetic only - geometric shapes representing data packets/nodes
+const NetworkConnections = ({ scrollSpeed }: { scrollSpeed: React.MutableRefObject<number> }) => {
+  const groupRef = useRef<THREE.Group>(null!);
+
+  useFrame((state, delta) => {
+     if(groupRef.current) {
+         // Move connections faster when scrolling
+         groupRef.current.rotation.z += delta * 0.1 * (1 + scrollSpeed.current * 10);
+     }
+  });
+
   return (
-    <group>
+    <group ref={groupRef}>
       <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
         <Line
             points={[[-2, -1, 0], [2, 1, 0]]}
@@ -88,30 +101,72 @@ const NetworkConnections = () => {
   );
 }
 
-const CameraController = () => {
+const CameraController = ({ scrollSpeed }: { scrollSpeed: React.MutableRefObject<number> }) => {
   useFrame((state) => {
     // Smooth parallax based on mouse position
     const x = (state.mouse.x * 0.5);
     const y = (state.mouse.y * 0.5);
     
-    state.camera.position.x = THREE.MathUtils.lerp(state.camera.position.x, x, 0.02);
-    state.camera.position.y = THREE.MathUtils.lerp(state.camera.position.y, y, 0.02);
+    // Camera shake on fast scroll
+    const shake = scrollSpeed.current * 0.1;
+    const shakeX = (Math.random() - 0.5) * shake;
+    const shakeY = (Math.random() - 0.5) * shake;
+
+    state.camera.position.x = THREE.MathUtils.lerp(state.camera.position.x, x + shakeX, 0.02);
+    state.camera.position.y = THREE.MathUtils.lerp(state.camera.position.y, y + shakeY, 0.02);
+    
+    // Zoom out slightly on fast scroll
+    const targetZ = 2.5 + scrollSpeed.current;
+    state.camera.position.z = THREE.MathUtils.lerp(state.camera.position.z, targetZ, 0.05);
+
     state.camera.lookAt(0, 0, 0);
   });
   return null;
 }
 
 const Background3D: React.FC = () => {
+  const scrollSpeed = useRef(0);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const delta = Math.abs(currentScrollY - lastScrollY.current);
+      
+      // Normalize speed (0 to ~5)
+      const speed = Math.min(delta / 5, 5);
+      scrollSpeed.current = speed;
+      
+      lastScrollY.current = currentScrollY;
+
+      // Decay speed
+      setTimeout(() => {
+          if (window.scrollY === currentScrollY) {
+             const decayInterval = setInterval(() => {
+                 scrollSpeed.current *= 0.9;
+                 if (scrollSpeed.current < 0.01) {
+                     scrollSpeed.current = 0;
+                     clearInterval(decayInterval);
+                 }
+             }, 50);
+          }
+      }, 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-[-1] bg-slate-950">
+    <div className="fixed inset-0 z-[-1] bg-slate-950 transition-colors duration-1000">
       <Canvas camera={{ position: [0, 0, 2.5], fov: 60 }}>
-        <CameraController />
+        <CameraController scrollSpeed={scrollSpeed} />
         <ambientLight intensity={0.1} />
         <pointLight position={[10, 10, 10]} intensity={0.5} color="#06b6d4" />
         
         <group>
-            <DataCloud />
-            <NetworkConnections />
+            <DataCloud scrollSpeed={scrollSpeed} />
+            <NetworkConnections scrollSpeed={scrollSpeed} />
             <Stars radius={50} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
         </group>
       </Canvas>

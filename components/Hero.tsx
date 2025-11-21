@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { ArrowDown, Download, Sparkles } from 'lucide-react';
 import { RESUME_DATA } from '../constants';
 
@@ -36,11 +36,49 @@ const useScrambleText = (text: string, speed: number = 30) => {
   return display;
 };
 
+const MagneticButton: React.FC<{ children: React.ReactNode; href?: string; className?: string; primary?: boolean }> = ({ children, href, className, primary }) => {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const xSpring = useSpring(x, { stiffness: 150, damping: 15, mass: 0.1 });
+  const ySpring = useSpring(y, { stiffness: 150, damping: 15, mass: 0.1 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const { left, top, width, height } = ref.current.getBoundingClientRect();
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
+    x.set((e.clientX - centerX) * 0.3);
+    y.set((e.clientY - centerY) * 0.3);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.a
+      ref={ref}
+      href={href}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ x: xSpring, y: ySpring }}
+      className={className}
+    >
+      {children}
+    </motion.a>
+  );
+};
+
 const Hero: React.FC = () => {
   const scrambledName = useScrambleText(RESUME_DATA.personal.name);
   const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 200]);
-  const y2 = useTransform(scrollY, [0, 500], [0, -150]);
+  // Parallax for the entire text block to prevent overlapping
+  const yText = useTransform(scrollY, [0, 500], [0, 150]); 
+  // Parallax for the card (moving in opposite direction or slower)
+  const yCard = useTransform(scrollY, [0, 500], [0, -50]);
 
   const cardRef = useRef<HTMLDivElement>(null);
   
@@ -52,7 +90,7 @@ const Hero: React.FC = () => {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     
-    const rotateX = ((y - centerY) / centerY) * -10; // Max 10deg rotation
+    const rotateX = ((y - centerY) / centerY) * -10; 
     const rotateY = ((x - centerX) / centerX) * 10;
 
     cardRef.current.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
@@ -68,9 +106,8 @@ const Hero: React.FC = () => {
       <div className="max-w-6xl w-full z-10">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
             
-          {/* Text Content */}
-          <div className="lg:col-span-3 space-y-8 relative">
-            <motion.div style={{ y: y1 }} className="relative z-10">
+          {/* Text Content - Wrapped in single motion div for unified parallax */}
+          <motion.div style={{ y: yText }} className="lg:col-span-3 space-y-8 relative z-10">
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -95,45 +132,46 @@ const Hero: React.FC = () => {
               >
                 Building Scalable Data Systems
               </motion.h2>
-            </motion.div>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg text-slate-400 leading-relaxed max-w-2xl border-l-2 border-slate-800 pl-6"
-            >
-              {RESUME_DATA.personal.summary}
-            </motion.p>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-lg text-slate-400 leading-relaxed max-w-2xl border-l-2 border-slate-800 pl-6"
+              >
+                {RESUME_DATA.personal.summary}
+              </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="flex flex-wrap gap-4 pt-4"
-            >
-              <a
-                href="#contact"
-                className="group relative px-8 py-3 bg-cyan-500 text-slate-950 font-bold rounded-full overflow-hidden transition-all hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="flex flex-wrap gap-4 pt-4"
               >
-                <span className="relative z-10 flex items-center gap-2">
-                   Get in Touch <Sparkles size={18} />
-                </span>
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-              </a>
-              <a
-                href="#"
-                className="px-8 py-3 border border-slate-700 hover:border-cyan-500/50 hover:bg-slate-900/50 text-slate-300 font-medium rounded-full transition-all flex items-center gap-2 backdrop-blur-sm"
-              >
-                <Download size={18} />
-                Download Resume
-              </a>
-            </motion.div>
-          </div>
+                <MagneticButton
+                  href="#contact"
+                  className="group relative px-8 py-3 bg-cyan-500 text-slate-950 font-bold rounded-full overflow-hidden transition-all hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
+                  primary
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                     Get in Touch <Sparkles size={18} />
+                  </span>
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                </MagneticButton>
+
+                <MagneticButton
+                  href="#"
+                  className="px-8 py-3 border border-slate-700 hover:border-cyan-500/50 hover:bg-slate-900/50 text-slate-300 font-medium rounded-full transition-all flex items-center gap-2 backdrop-blur-sm"
+                >
+                  <Download size={18} />
+                  Download Resume
+                </MagneticButton>
+              </motion.div>
+          </motion.div>
 
           {/* Interactive Stats Card */}
           <motion.div
-            style={{ y: y2 }}
+            style={{ y: yCard }}
             className="hidden lg:col-span-2 lg:block relative perspective-1000"
           >
              <div 
@@ -194,7 +232,7 @@ const Hero: React.FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 1, repeat: Infinity, repeatType: "reverse" }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-slate-500 hover:text-cyan-400 cursor-pointer"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-slate-500 hover:text-cyan-400 cursor-pointer z-20"
       >
         <ArrowDown size={24} />
       </motion.a>
